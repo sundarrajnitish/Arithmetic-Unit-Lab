@@ -1,0 +1,51 @@
+== 1. Does every 2023 file compile? (GHDL, VHDL-93, Synopsys packages, ModelSim-style -fexplicit)
+   FAIL  Additional Requirements/wallace_tree_test.vhd: type mark expected in a subtype indication
+   FAIL  Minimum Requirement v2/sync_arithmetic_hw.vhd: no declaration for "load_a"
+   FAIL  Minimum Requirement/Adders/carry_save_adder.vhd: no function declarations for operator "or"
+   FAIL  Minimum Requirement/Alternate Designs/internal_register_16_beh.vhd: misspelling, "internal_register_16_beh" expected
+   FAIL  Minimum Requirement/Alternate Designs/internal_register_8_beh.vhd: misspelling, "internal_register_8_beh" expected
+   FAIL  Submission/Minimal Requirement/arithmetic_hw.vhd: misspelling, "arithmeitc_hw" expected
+   FAIL  header.vhd: design file is empty (no design unit found)
+   7 of 97 files do not analyse on their own.
+== 2. Submitted combinational multipliers, all 65,536 operand pairs
+   RESULT array_multiplier mismatches=0/65536
+   RESULT wallace_tree_multiplier mismatches=0/65536
+== 3. Submitted testbenches as written
+   tb_array_multiplier: 254 failed assertions; prints 'All Test Cases Passed': yes
+   tb_divider_unit: 65532 failed assertions; prints 'All Test Cases Passed': no
+   tb_full_adder_16: 65535 failed assertions; prints 'All Test Cases Passed': no
+   tb_half_adder: 0 failed assertions; prints 'All Test Cases Passed': no
+   tb_full_adder: 0 failed assertions; prints 'All Test Cases Passed': no
+   tb_multiplier: 0 failed assertions; prints 'All Test Cases Passed': no
+   (tb_arithmetic_hw cannot run: arithmetic_hw.vhd does not compile, see 1.)
+== 4. Submitted synchronous unit (entity 'synthesis' renamed so it can bind), A=200 B=100
+   load high for 1 clock(s):
+     TRACE cycle=1 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=2 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=3 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=4 status='1' P=0XXXXXXXXXXXXXXX
+     TRACE cycle=5 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=6 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=7 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=8 status='0' P=ZZZZZZZZZZZZZZZZ
+     EXPECTED 5001
+   load high for 2 clock(s):
+     TRACE cycle=1 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=2 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=3 status='1' P=5001
+     TRACE cycle=4 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=5 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=6 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=7 status='0' P=ZZZZZZZZZZZZZZZZ
+     TRACE cycle=8 status='0' P=ZZZZZZZZZZZZZZZZ
+     EXPECTED 5001
+== 5. 2023 generic Baugh-Wooley array (N=8, all pairs) and signed 2^C divider
+   RESULT baugh unsigned mismatches=0/65536
+   RESULT baugh signed mismatches=0/65536
+   RESULT divider_2c signed: non-negative inputs wrong=98304/98304, negative inputs wrong=0/98304
+== 6. 2023 additional-requirements unit, P = A*B/2^C + D, 2000 random vectors each
+   RESULT v3 sgn='0' wrong(trunc)=0 wrong(floor)=0 X=0 of 2000
+   RESULT v3 sgn='1' wrong(trunc)=1996 wrong(floor)=2000 X=0 of 2000
+== 7. Generic sizes: does the 2023 generic adder elaborate for N = 17 (a 34-bit product)?
+   does not elaborate (hard-coded 32-bit internals, K = 32)
+== done

@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arithmetic Unit Lab</title>
+<meta name="description" content="A structural-VHDL arithmetic unit (P = A*B/4 + 1 and its generic, signed, serial extensions) with a cycle-accurate simulator, Dadda and array multiplier explorers, timing and synthesis results.">
+<meta name="author" content="Nitish Sundarraj">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Crect x='1' y='1' width='28' height='28' rx='4' fill='%235a2a82'/%3E%3Cpath d='M8 21 L15 8 L22 21 M11 16 H19' stroke='white' stroke-width='2.4' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Arithmetic Unit Lab, top of page">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <rect x="1" y="1" width="28" height="28" rx="4" fill="var(--brand)"/>
+        <path d="M8 21 L15 8 L22 21 M11 16 H19" stroke="#fff" stroke-width="2.4" fill="none" stroke-linejoin="round"/>
+        <circle cx="22" cy="21" r="2.2" fill="var(--sig-bus)"/>
+      </svg>
+      <span>Arithmetic Unit Lab<small>COEN 6501 · structural VHDL</small></span>
+    </a>
+    <ul>
+      <li><a href="#simulator">Simulator</a></li>
+      <li><a href="#multipliers">Multipliers</a></li>
+      <li><a href="#timing">Timing</a></li>
+      <li><a href="#dividers">Dividers</a></li>
+      <li><a href="#serial">Serial I/O</a></li>
+      <li><a href="#verification">Verification</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#changes">2023 → v2</a></li>
+      <li><a href="#method">Method</a></li>
+    </ul>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch colour theme" title="Switch colour theme">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 1.5v11a5.5 5.5 0 0 1 0-11z" fill="currentColor"/></svg>
+    </button>
+    <a class="btn btn-primary btn-sm cta" href="https://github.com/sundarrajnitish/Arithmetic-Unit-Lab">Source on GitHub</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <canvas class="trace-bg" id="traceBg" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Digital system design · FPGA arithmetic</div>
+      <h1>An arithmetic unit, built up from full adders.</h1>
+      <p class="formula"><span>P = A·B/4 + 1</span><span>A·B/2<sup>C</sup> + D</span><span>A·B/C² + D</span></p>
+      <p class="lead">Two 8-bit operands go into registers, a multiplier forms the product, a shifter divides it and an adder finishes the formula, all in structural VHDL. This lab rebuilds a 2023 course project: generic widths, signed numbers, both division formulas, serial I/O and a speed pass. Every result on this page is checked against the same reference model as the testbenches.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#simulator">Run the simulator</a>
+        <a class="btn btn-ghost" href="#changes">What changed since 2023</a>
+      </div>
+    </div>
+    <figure class="hero-viz" style="margin:0">
+      <canvas id="heroDots" width="640" height="400" aria-label="Animated Dadda reduction of an 8 by 8 partial-product matrix"></canvas>
+      <figcaption class="cap"><span>8×8 partial products → Dadda stages <b id="heroStage">8</b></span><span>height ≤ <b id="heroTarget">8</b> · <b id="heroAdders">0 FA</b></span></figcaption>
+    </figure>
+  </div>
+</header>
+
+<section class="kpis" aria-label="Key numbers">
+  <div class="wrap">
+    <div class="kpi"><div class="v" id="kpiPairs">65,536</div><div class="l">operand pairs checked for every multiplier and the P = A·B/4 + 1 unit (N = 8)</div></div>
+    <div class="kpi"><div class="v" id="kpiRuns">–</div><div class="l">regression runs across widths 2–32, three adder and two multiplier architectures, 0 failures</div></div>
+    <div class="kpi"><div class="v">56 <small>→</small> 8</div><div class="l">device pins for the full unit once operands and result travel serially</div></div>
+    <div class="kpi"><div class="v" id="kpiFmax">–</div><div class="l" id="kpiFmaxL">8×8 multiplier fmax, Dadda tree + FPGA carry chain vs the 2023 array (iCE40 HX8K)</div></div>
+  </div>
+</section>
+
+<!-- ================================================================ SIMULATOR -->
+<section class="band" id="simulator">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><div class="eyebrow">Cycle simulator</div><h2>Clock the unit one edge at a time</h2></div>
+      <p class="lead">Set the operands, press <b>Load</b>, then step the clock. The datapath lights up the block the state machine is using, the registers show what they captured, and the waveform keeps the history. The model behind it is bit-accurate to <code>rtl/top/arith_unit.vhd</code> and is tested against the same 11,344 vectors as the VHDL.</p>
+    </div>
+
+    <div class="tool">
+      <div class="tool-bar">
+        <span class="title">arith_unit</span><span class="sub" id="simCfg">N=8 · CW=8 · DW=8</span>
+        <span class="spacer"></span>
+        <span class="pill info" id="simState">IDLE</span>
+      </div>
+      <div class="sim-grid">
+        <div class="stim tool-body">
+          <div class="pane-title">Stimulus</div>
+          <div class="chips" id="presets" aria-label="Examples">
+            <button class="chip" type="button" data-p="spec">200·100/4 + 1</button>
+            <button class="chip" type="button" data-p="neg">−5·3/2¹ (signed)</button>
+            <button class="chip" type="button" data-p="sq">200·100/5² + 7</button>
+            <button class="chip" type="button" data-p="sqneg">−128·127/3² − 1</button>
+            <button class="chip" type="button" data-p="dz">÷0²</button>
+          </div>
+          <div class="field">
+            <span class="lbl">Formula</span>
+            <div class="seg" id="fselSeg" role="group" aria-label="Formula">
+              <button type="button" data-v="0" class="on">A·B/2<sup>C</sup> + D</button>
+              <button type="button" data-v="1">A·B/C² + D</button>
+            </div>
+          </div>
+          <div class="field">
+            <span class="lbl">Number format</span>
+            <div class="seg" id="sgnSeg" role="group" aria-label="Number format">
+              <button type="button" data-v="0" class="on">Unsigned</button>
+              <button type="button" data-v="1">Signed</button>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label for="inA">A <span id="inAb"></span></label><input id="inA" type="number" value="200"></div>
+            <div class="field"><label for="inB">B <span id="inBb"></span></label><input id="inB" type="number" value="100"></div>
+            <div class="field"><label for="inC">C <span>unsigned</span></label><input id="inC" type="number" value="2" min="0" max="255"></div>
+            <div class="field"><label for="inD">D <span id="inDb"></span></label><input id="inD" type="number" value="1"></div>
+          </div>
+          <p class="small muted" id="rangeNote">A, B, D: 0 … 255</p>
+          <div class="sim-ctrl">
+            <button class="btn btn-primary btn-sm" id="bLoad" type="button">Load</button>
+            <button class="btn btn-line btn-sm" id="bStep" type="button">Clock ▸</button>
+            <button class="btn btn-line btn-sm" id="bRun" type="button">Run to status</button>
+            <button class="btn btn-line btn-sm" id="bReset" type="button">Reset</button>
+          </div>
+          <p class="small muted">Load raises <code>load</code> for the next rising edge only, the way the specification describes it.</p>
+        </div>
+
+        <div class="tool-body">
+          <div class="pane-title">Datapath and state machine</div>
+          <div class="diagram" id="datapath"></div>
+          <p class="small muted mt8" id="stateNote">Idle. Press Load to latch the operands on the next clock edge.</p>
+        </div>
+
+        <div class="readout tool-body">
+          <div>
+            <div class="pane-title">Output P</div>
+            <div class="bigp" id="outP">0<small>status 0</small></div>
+          </div>
+          <div id="checkBox"></div>
+          <table class="reg-table" id="regTable" aria-label="Registers"></table>
+        </div>
+      </div>
+      <div class="wave" aria-label="Waveform">
+        <div class="wave-bar"><span>waveform · <b id="waveCycles">0</b> cycles</span><span>cursor at the last edge · values after the edge</span></div>
+        <div class="wave-scroll" id="waveScroll"><canvas id="wave" height="240"></canvas></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= MULTIPLIERS -->
+<section class="band alt" id="multipliers">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><div class="eyebrow">Multiplier explorer</div><h2>Where the partial products go</h2></div>
+      <p class="lead">An N×N multiply is N² one-bit products added in the right columns. The carry-save array adds them row by row; the Dadda tree squeezes every column at once with full and half adders until two rows remain. Both handle signed operands with the Baugh-Wooley trick: complement the bits that touch exactly one sign bit and add 2<sup>N</sup> + 2<sup>2N−1</sup>.</p>
+    </div>
+    <div class="tool">
+      <div class="tool-bar">
+        <span class="title">multiplier</span><span class="sub" id="mCfg"></span>
+        <span class="spacer"></span>
+        <div class="tabs" role="tablist">
+          <button class="tab on" type="button" data-arch="DADDA" role="tab" aria-selected="true">Dadda tree</button>
+          <button class="tab" type="button" data-arch="ARRAY" role="tab" aria-selected="false">Carry-save array</button>
+        </div>
+      </div>
+      <div class="mult-grid">
+        <div class="ctrl tool-body">
+          <div class="field"><label for="mN">Operand width N <span id="mNv">8</span></label><input id="mN" type="range" min="3" max="16" value="8"></div>
+          <div class="field"><span class="lbl">Operands</span>
+            <div class="seg" id="mSgn" role="group" aria-label="Operand format"><button type="button" data-v="0" class="on">Unsigned</button><button type="button" data-v="1">Signed</button></div></div>
+          <div class="grid2">
+            <div class="field"><label for="mA">A</label><input id="mA" type="number" value="181"></div>
+            <div class="field"><label for="mB">B</label><input id="mB" type="number" value="109"></div>
+          </div>
+          <button class="btn btn-line btn-sm" id="mRand" type="button">Random operands</button>
+          <div id="stageCtl">
+            <div class="field"><label for="mStage">Reduction stage <span id="mStageV"></span></label><input id="mStage" type="range" min="0" max="4" value="0"></div>
+            <div class="row mt8"><button class="btn btn-line btn-sm" id="mPlay" type="button">Play stages</button></div>
+          </div>
+          <dl class="kv" id="mResult"></dl>
+        </div>
+        <div class="tool-body">
+          <div class="stat-row" id="mStats"></div>
+          <div class="dots-scroll mt16" id="mView"></div>
+          <div class="legend mt16" id="mLegend"></div>
+          <p class="small muted mt8" id="mNote"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== TIMING -->
+<section class="band" id="timing">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><div class="eyebrow">Settling time</div><h2>Watch the carries ripple</h2></div>
+      <p class="lead">Change the operands and every cell recomputes one delay unit later. This view runs the four multiplier netlists side by side, cell for cell as the VHDL instantiates them, and shows the product bits flickering until they settle. The row where the picture stops changing is the delay; the grey band marks the longest path through the cells.</p>
+    </div>
+    <div class="tool">
+      <div class="tool-bar">
+        <span class="title">unit-delay simulation</span><span class="sub" id="tCfg"></span><span class="spacer"></span>
+        <button class="btn btn-line btn-sm" id="tWorst" type="button">Find a slow transition</button>
+        <button class="btn btn-line btn-sm" id="tRand" type="button">Random transition</button>
+      </div>
+      <div class="tool-body">
+        <div class="row">
+          <div class="field" style="width:130px"><label for="tN">N</label><select id="tN"><option>4</option><option selected>8</option><option>12</option><option>16</option></select></div>
+          <div class="field" style="width:150px"><label for="tA0">A, B before</label><input id="tA0" type="text" value="129, 73"></div>
+          <div class="field" style="width:150px"><label for="tA1">A, B after</label><input id="tA1" type="text" value="75, 109"></div>
+          <p class="small muted" style="flex:1;min-width:220px">Each row of a chart is one delay unit, top to bottom. Each column is a product bit, MSB on the left. Purple cells are 1s; orange marks a bit that changed in that step.</p>
+        </div>
+        <div class="timing-grid mt16" id="tGrid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ DIVIDERS -->
+<section class="band alt" id="dividers">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><div class="eyebrow">Division</div><h2>Two ways to divide, one rounding rule</h2></div>
+      <p class="lead">Dividing by 2<sup>C</sup> is a shift; dividing by C² needs a real divider. Both round toward zero, the rule VHDL, C and Python use for integers. A plain arithmetic shift rounds negative numbers down instead, so the shifter reports whether it dropped any 1s from a negative number and the final adder adds that bit through its carry-in. No extra adder needed.</p>
+    </div>
+    <div class="two">
+      <div class="tool">
+        <div class="tool-bar"><span class="title">shift_divider</span><span class="sub">x / 2^C, W = 16</span></div>
+        <div class="tool-body">
+          <div class="row">
+            <div class="field" style="flex:1;min-width:130px"><label for="sX">x (signed 16-bit)</label><input id="sX" type="number" value="-15" min="-32768" max="32767"></div>
+            <div class="field" style="flex:1;min-width:130px"><label for="sC">C <span id="sCv">1</span></label><input id="sC" type="range" min="0" max="18" value="1"></div>
+          </div>
+          <div class="chips mt8"><button class="chip" type="button" data-x="-15" data-c="1">−15 ÷ 2¹: rounding</button><button class="chip" type="button" data-x="1000" data-c="3">1000 ÷ 2³: the 2023 bug</button><button class="chip" type="button" data-x="-1" data-c="18">−1 ÷ 2¹⁸: shift past the word</button></div>
+          <div class="bitstrip" id="sBits" aria-label="Bits after the shift"></div>
+          <div class="legend mt8"><span><i style="background:var(--brand)"></i>kept</span><span><i style="background:var(--accent)"></i>sign fill</span><span><i style="background:var(--warn)"></i>1 shifted out (round up)</span><span><i style="background:var(--ink-3)"></i>0 shifted out</span></div>
+          <div class="tbl-wrap mt16"><table class="data"><tbody id="sTbl"></tbody></table></div>
+        </div>
+      </div>
+      <div class="tool">
+        <div class="tool-bar"><span class="title">restoring_divider</span><span class="sub">|x| / C², one bit per clock</span></div>
+        <div class="tool-body">
+          <div class="row">
+            <div class="field" style="flex:1;min-width:120px"><label for="dX">|A·B|</label><input id="dX" type="number" value="20000" min="0" max="65535"></div>
+            <div class="field" style="flex:1;min-width:100px"><label for="dC">C <span id="dCv">5 → C² = 25</span></label><input id="dC" type="range" min="1" max="30" value="5"></div>
+          </div>
+          <div class="tbl-wrap mt16" style="max-height:360px;overflow:auto"><table class="data step-tbl"><thead><tr><th class="num">clk</th><th class="num">bit in</th><th class="num">trial r</th><th>r ≥ C²?</th><th class="num">remainder</th><th class="num">quotient so far</th></tr></thead><tbody id="dTbl"></tbody></table></div>
+          <p class="small muted mt8" id="dNote"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== SERIAL -->
+<section class="band" id="serial">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><div class="eyebrow">Serial I/O</div><h2>Fifty-six pins become eight</h2></div>
+      <p class="lead">The parallel unit needs 56 pins: clock, reset and load, 34 input bits (A, B, C, D, sgn, fsel) and 19 outputs (P, status, err, ovf). <code>arith_unit_serial</code> shifts the same fields in one bit per clock, pulses <code>start</code>, and shifts <code>P</code>, <code>err</code> and <code>ovf</code> back out. The frames below are built from the operands in the simulator above.</p>
+    </div>
+    <div class="tool">
+      <div class="tool-bar"><span class="title">arith_unit_serial</span><span class="sub">clk · reset_n · sin · sin_en · start · sout · sout_valid · busy</span><span class="spacer"></span>
+        <button class="btn btn-line btn-sm" id="serPlay" type="button">Play transfer</button></div>
+      <div class="tool-body">
+        <div class="pane-title">Input frame, LSB first (<span id="serInLen">34</span> bits)</div>
+        <div class="frame" id="serIn"></div>
+        <div class="pane-title mt16">Output frame, LSB first (<span id="serOutLen">18</span> bits)</div>
+        <div class="frame" id="serOut"></div>
+        <div class="wave mt16" style="border:1px solid var(--line);border-radius:4px">
+          <div class="wave-bar"><span>serial transfer · <b id="serCycles">0</b> clocks</span><span id="serPhase">shift in → compute → shift out</span></div>
+          <div class="wave-scroll"><canvas id="serWave" height="150"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ VERIFICATION -->
+<section class="band alt" id="verification">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><div class="eyebrow">Verification</div><h2>One reference model, three consumers</h2></div>
+      <p class="lead">A short Python model states what every output must be. It writes the vector files; the VHDL testbenches drive the real handshake with them, and this page's JavaScript model is tested against the same files. Where the input space is small enough, the benches try every input instead.</p>
+    </div>
+    <div class="tbl-wrap"><table class="data" id="tbTable"><thead><tr><th>Testbench</th><th>What it proves</th><th class="num">Runs</th><th class="num">Checks</th><th>Result</th></tr></thead><tbody></tbody></table></div>
+    <p class="small muted mt8" id="tbNote"></p>
+  </div>
+</section>
+
+<!-- ================================================================= RESULTS -->
+<section class="band" id="results">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><div class="eyebrow">Synthesis</div><h2>Area and speed, measured</h2></div>
+      <p class="lead">Each multiplier sits between input and output registers and goes through yosys and nextpnr for a Lattice iCE40 HX8K, three placement seeds each. The gate depth counts logic gates on the longest path as the VHDL writes them, before the tool restructures anything. A structural prefix adder shortens that depth a lot, but on a LUT FPGA the dedicated carry chain wins: the fastest build pairs the Dadda tree with an inferred final adder.</p>
+    </div>
+    <div class="charts">
+      <div class="chart"><h4>fmax of the multiplier alone</h4><p class="note">MHz, register to register, median of 3 seeds</p><div id="chFmax"></div></div>
+      <div class="chart"><h4>Size of the multiplier</h4><p class="note">4-input LUTs</p><div id="chLut"></div></div>
+    </div>
+    <div class="legend mt16" id="chLegend"></div>
+    <h3 class="mt24" style="font-size:18px">8×8 multipliers side by side</h3>
+    <div class="tbl-wrap mt8"><table class="data" id="multTable"><thead><tr><th>Multiplier</th><th class="num">LUT4</th><th class="num">fmax MHz</th><th class="num">Gate depth as written</th><th class="num">Gates</th></tr></thead><tbody></tbody></table></div>
+    <h3 class="mt24" style="font-size:18px">Complete units at N = 8</h3>
+    <div class="tbl-wrap mt8"><table class="data" id="unitTable"><thead><tr><th>Design</th><th class="num">LUT4</th><th class="num">Flip-flops</th><th class="num">fmax MHz</th><th>Notes</th></tr></thead><tbody></tbody></table></div>
+    <p class="small muted mt8" id="synthNote"></p>
+  </div>
+</section>
+
+<!-- ================================================================= CHANGES -->
+<section class="band alt" id="changes">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><div class="eyebrow">2023 → v2</div><h2>What the audit found</h2></div>
+      <p class="lead">The 2023 multipliers were right: all 65,536 products of the array, the reorganised array and the Baugh-Wooley array check out. The problems sat around them, in wiring, handshakes, sign handling and tests that could not fail. Every item below is reproduced by <code>legacy/audit/run_audit.sh</code> against the original files, which are kept unchanged in <code>legacy/</code>.</p>
+    </div>
+    <div class="tool">
+      <div class="tool-bar"><span class="title">2023 sync unit, replayed</span><span class="sub">load held for one clock · A = 200, B = 100 · expected 5001</span></div>
+      <div class="wave"><div class="wave-scroll"><canvas id="legacyWave" height="150"></canvas></div></div>
+    </div>
+    <div class="findings mt24" id="findings"></div>
+  </div>
+</section>
+
+<!-- ================================================================== METHOD -->
+<section class="band" id="method">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><div class="eyebrow">Method</div><h2>From specification to bitstream</h2></div>
+      <p class="lead">Everything runs on open tools: GHDL for simulation, yosys with the GHDL plugin and nextpnr for synthesis, Python and Node for the models. The RTL is plain VHDL-93, so ModelSim and Quartus take it as well; a Quartus project for the course's MAX 10 board is in <code>syn/quartus</code>.</p>
+    </div>
+    <div class="flow">
+      <div><span class="eyebrow">Specify</span><h4>Golden model</h4><p><code>model/au_model.py</code> defines P, err, ovf and the latency for every input, plus the Dadda plan.</p></div>
+      <div><span class="eyebrow">Design</span><h4>Structural RTL</h4><p>Full adders, half adders, partial-product and prefix cells, registers. Generics pick N, C and D widths and architectures.</p></div>
+      <div><span class="eyebrow">Verify</span><h4>GHDL testbenches</h4><p>Exhaustive where possible, model vectors elsewhere, driven through the real load/status handshake.</p></div>
+      <div><span class="eyebrow">Measure</span><h4>yosys + nextpnr</h4><p>LUTs, flip-flops, fmax and as-written gate depth for every architecture and width.</p></div>
+      <div><span class="eyebrow">Explain</span><h4>This site</h4><p>A JavaScript port of the RTL, tested against the same vectors, drives every simulation here.</p></div>
+    </div>
+    <div class="two mt24">
+      <div><div class="pane-title">Run it</div>
+<pre class="code"><span class="c"># Ubuntu: apt install ghdl yosys yosys-plugin-ghdl nextpnr-ice40</span>
+git clone https://github.com/sundarrajnitish/Arithmetic-Unit-Lab
+cd Arithmetic-Unit-Lab
+scripts/run_tests.sh           <span class="c"># full regression</span>
+legacy/audit/run_audit.sh      <span class="c"># reproduce the 2023 findings</span>
+python3 scripts/synth_sweep.py <span class="c"># area and fmax sweep</span>
+node tests/test_js_model.mjs   <span class="c"># site model vs vectors</span></pre></div>
+      <div><div class="pane-title">Repository</div>
+<pre class="code">rtl/cells/    half_adder full_adder pp_cell pg_black reg_en dff_en
+rtl/arith/    ripple / kogge_stone / cpa · array / dadda / multiplier
+              shift_divider · restoring_divider
+rtl/top/      arith_unit_min · arith_unit · arith_unit_serial
+tb/           self-checking testbenches + golden-model vectors
+model/        au_model.py (reference)       tests/  pytest + node
+syn/          harnesses, Quartus MAX 10 project, SDC
+legacy/       the 2023 sources, untouched · audit/</pre></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Arithmetic Unit Lab · Nitish Sundarraj · COEN 6501 Digital Systems Design, Concordia University, Fall 2023, revisited 2026</span>
+    <span><a href="https://github.com/sundarrajnitish/Arithmetic-Unit-Lab">github.com/sundarrajnitish/Arithmetic-Unit-Lab</a> · Apache-2.0</span>
+  </div>
+</footer>
+
+<script src="js/model.js"></script>
+<script src="data/site-data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

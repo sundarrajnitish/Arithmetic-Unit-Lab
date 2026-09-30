@@ -1,0 +1,93 @@
+== analyse (RTL as VHDL-93 and VHDL-2008, testbenches as VHDL-2008)
+== golden model and website model
+  ok    pytest: 22 passed in 2.05s
+  ok    node: PASS test_js_model checks=52470
+== cells and adders
+  ok    PASS tb_cells
+  ok    PASS tb_cpa W=1 RIPPLE checks=8
+  ok    PASS tb_cpa W=1 KOGGE_STONE checks=8
+  ok    PASS tb_cpa W=1 INFERRED checks=8
+  ok    PASS tb_cpa W=4 RIPPLE checks=512
+  ok    PASS tb_cpa W=4 KOGGE_STONE checks=512
+  ok    PASS tb_cpa W=4 INFERRED checks=512
+  ok    PASS tb_cpa W=8 RIPPLE checks=131072
+  ok    PASS tb_cpa W=8 KOGGE_STONE checks=131072
+  ok    PASS tb_cpa W=8 INFERRED checks=131072
+  ok    PASS tb_cpa W=16 RIPPLE checks=10003
+  ok    PASS tb_cpa W=16 KOGGE_STONE checks=10003
+  ok    PASS tb_cpa W=17 RIPPLE checks=10003
+  ok    PASS tb_cpa W=17 KOGGE_STONE checks=10003
+  ok    PASS tb_cpa W=33 RIPPLE checks=10003
+  ok    PASS tb_cpa W=33 KOGGE_STONE checks=10003
+  ok    PASS tb_cpa W=64 RIPPLE checks=10003
+  ok    PASS tb_cpa W=64 KOGGE_STONE checks=10003
+== multipliers
+  ok    PASS tb_multiplier N=2 ARRAY/RIPPLE checks=32
+  ok    PASS tb_multiplier N=2 ARRAY/KOGGE_STONE checks=32
+  ok    PASS tb_multiplier N=2 DADDA/RIPPLE checks=32
+  ok    PASS tb_multiplier N=2 DADDA/KOGGE_STONE checks=32
+  ok    PASS tb_multiplier N=3 ARRAY/RIPPLE checks=128
+  ok    PASS tb_multiplier N=3 ARRAY/KOGGE_STONE checks=128
+  ok    PASS tb_multiplier N=3 DADDA/RIPPLE checks=128
+  ok    PASS tb_multiplier N=3 DADDA/KOGGE_STONE checks=128
+  ok    PASS tb_multiplier N=4 ARRAY/RIPPLE checks=512
+  ok    PASS tb_multiplier N=4 ARRAY/KOGGE_STONE checks=512
+  ok    PASS tb_multiplier N=4 DADDA/RIPPLE checks=512
+  ok    PASS tb_multiplier N=4 DADDA/KOGGE_STONE checks=512
+  ok    PASS tb_multiplier N=5 ARRAY/RIPPLE checks=2048
+  ok    PASS tb_multiplier N=5 ARRAY/KOGGE_STONE checks=2048
+  ok    PASS tb_multiplier N=5 DADDA/RIPPLE checks=2048
+  ok    PASS tb_multiplier N=5 DADDA/KOGGE_STONE checks=2048
+  ok    PASS tb_multiplier N=8 ARRAY/RIPPLE checks=131072
+  ok    PASS tb_multiplier N=8 ARRAY/KOGGE_STONE checks=131072
+  ok    PASS tb_multiplier N=8 DADDA/RIPPLE checks=131072
+  ok    PASS tb_multiplier N=8 DADDA/KOGGE_STONE checks=131072
+  ok    PASS tb_multiplier N=12 ARRAY/KOGGE_STONE checks=10128
+  ok    PASS tb_multiplier N=12 DADDA/KOGGE_STONE checks=10128
+  ok    PASS tb_multiplier N=16 ARRAY/KOGGE_STONE checks=10128
+  ok    PASS tb_multiplier N=16 DADDA/KOGGE_STONE checks=10128
+  ok    PASS tb_multiplier N=24 ARRAY/KOGGE_STONE checks=10128
+  ok    PASS tb_multiplier N=24 DADDA/KOGGE_STONE checks=10128
+  ok    PASS tb_multiplier N=32 ARRAY/KOGGE_STONE checks=10128
+  ok    PASS tb_multiplier N=32 DADDA/KOGGE_STONE checks=10128
+  ok    PASS tb_multiplier N=8 ARRAY/INFERRED checks=131072
+  ok    PASS tb_multiplier N=8 DADDA/INFERRED checks=131072
+== dividers
+  ok    PASS tb_shift_divider W=8 CW=5 checks=16384
+  ok    PASS tb_shift_divider W=10 CW=4 checks=32768
+  ok    PASS tb_shift_divider W=16 CW=8 checks=256000
+  ok    PASS tb_restoring_divider W=8 DW=6 RIPPLE checks=16384
+  ok    PASS tb_restoring_divider W=8 DW=6 KOGGE_STONE checks=16384
+  ok    PASS tb_restoring_divider W=16 DW=16 RIPPLE checks=5000
+== minimum-requirement unit  P = A*B/4 + 1  (all 65,536 pairs for N = 8)
+  ok    PASS tb_arith_unit_min N=8 ARRAY/KOGGE_STONE PIPELINE=false results=65537
+  ok    PASS tb_arith_unit_min N=8 ARRAY/KOGGE_STONE PIPELINE=true results=65537
+  ok    PASS tb_arith_unit_min N=8 DADDA/KOGGE_STONE PIPELINE=false results=65537
+  ok    PASS tb_arith_unit_min N=8 DADDA/KOGGE_STONE PIPELINE=true results=65537
+  ok    PASS tb_arith_unit_min N=4 DADDA/RIPPLE PIPELINE=false results=257
+  ok    PASS tb_arith_unit_min N=16 DADDA/KOGGE_STONE PIPELINE=false results=5004
+  ok    PASS tb_arith_unit_min N=16 ARRAY/RIPPLE PIPELINE=true results=5004
+== general unit  P = A*B/2^C + D  |  A*B/C^2 + D   (golden-model vectors)
+  ok    PASS tb_arith_unit_vectors N=8 CW=8 DW=8 ARRAY/RIPPLE vectors=4720
+  ok    PASS tb_arith_unit_vectors N=8 CW=8 DW=8 ARRAY/KOGGE_STONE vectors=4720
+  ok    PASS tb_arith_unit_vectors N=8 CW=8 DW=8 DADDA/RIPPLE vectors=4720
+  ok    PASS tb_arith_unit_vectors N=8 CW=8 DW=8 DADDA/KOGGE_STONE vectors=4720
+  ok    PASS tb_arith_unit_vectors N=4 CW=4 DW=4 ARRAY/RIPPLE vectors=2148
+  ok    PASS tb_arith_unit_vectors N=4 CW=4 DW=4 ARRAY/KOGGE_STONE vectors=2148
+  ok    PASS tb_arith_unit_vectors N=4 CW=4 DW=4 DADDA/RIPPLE vectors=2148
+  ok    PASS tb_arith_unit_vectors N=4 CW=4 DW=4 DADDA/KOGGE_STONE vectors=2148
+  ok    PASS tb_arith_unit_vectors N=16 CW=8 DW=16 ARRAY/RIPPLE vectors=2256
+  ok    PASS tb_arith_unit_vectors N=16 CW=8 DW=16 ARRAY/KOGGE_STONE vectors=2256
+  ok    PASS tb_arith_unit_vectors N=16 CW=8 DW=16 DADDA/RIPPLE vectors=2256
+  ok    PASS tb_arith_unit_vectors N=16 CW=8 DW=16 DADDA/KOGGE_STONE vectors=2256
+  ok    PASS tb_arith_unit_vectors N=8 CW=8 DW=16 ARRAY/RIPPLE vectors=2220
+  ok    PASS tb_arith_unit_vectors N=8 CW=8 DW=16 ARRAY/KOGGE_STONE vectors=2220
+  ok    PASS tb_arith_unit_vectors N=8 CW=8 DW=16 DADDA/RIPPLE vectors=2220
+  ok    PASS tb_arith_unit_vectors N=8 CW=8 DW=16 DADDA/KOGGE_STONE vectors=2220
+  ok    PASS tb_arith_unit_vectors N=8 CW=8 DW=8 DADDA/INFERRED vectors=4720
+  ok    PASS tb_arith_unit_min N=8 DADDA/INFERRED PIPELINE=true results=65537
+== serial I/O wrapper
+  ok    PASS tb_arith_unit_serial frames=600 (in 34 bits, out 18 bits)
+  ok    PASS tb_arith_unit_serial frames=2000 (in 18 bits, out 10 bits)
+
+== 83 passed, 0 failed

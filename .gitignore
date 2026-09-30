@@ -1,0 +1,15 @@
+build/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.cf
+*.o
+work/
+node_modules/
+# Quartus / ModelSim output
+syn/quartus/db/
+syn/quartus/incremental_db/
+syn/quartus/output_files/
+sim/modelsim/work/
+*.wlf
+transcript

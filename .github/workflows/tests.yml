@@ -1,0 +1,37 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  simulate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GHDL, pytest and Node
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ghdl ghdl-mcode python3-pytest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Regression (VHDL, golden model, website model)
+        run: scripts/run_tests.sh
+      - name: Reproduce the 2023 audit
+        run: legacy/audit/run_audit.sh
+
+  synthesize:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install yosys, the GHDL plugin and nextpnr
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ghdl ghdl-mcode yosys yosys-plugin-ghdl nextpnr-ice40
+      - name: Synthesis sweep (N = 8)
+        run: python3 scripts/synth_sweep.py --quick
+      - uses: actions/upload-artifact@v4
+        with:
+          name: synthesis
+          path: results/synthesis.*

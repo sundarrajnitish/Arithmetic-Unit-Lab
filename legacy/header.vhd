@@ -1,0 +1,30 @@
+--------------------------------------------------------------------------------------
+--
+-- Authors: Nitish Sundarraj Balaji, Balaji Ravindaran
+-- 
+-- File: header.vhd
+
+-- Design Units:
+--      entity header
+--          function: To show a header
+--          input:
+--          output: 
+--      architecture header_arch:
+--          truth_table based sum-of-products
+--          implementation
+--
+-- Library/ Package:
+--      ieee.std_logic_1164: to use std_logic
+--
+-- Synthesis and Verification:
+--      Synthesis Software: 
+--      Options/Script :
+--      Target Technology:
+--      Test Bench: header_tb
+--
+-- Revision History
+--      Version 1.0:
+--      Date: 10/2023
+--      Comments: Original
+--
+--------------------------------------------------------------------------------------

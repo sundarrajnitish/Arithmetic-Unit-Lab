@@ -1,0 +1,3 @@
+# Arithmetic Unit Lab - Quartus Prime project (Nitish Sundarraj)
+QUARTUS_VERSION = "22.1"
+PROJECT_REVISION = "arith_unit"

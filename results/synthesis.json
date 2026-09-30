@@ -1,0 +1,800 @@
+{
+ "flow": "yosys synth_ice40 + nextpnr-ice40 --hx8k ct256, fmax = median of seeds 1, 2, 3",
+ "tools": {
+  "yosys": "Yosys 0.33 (git sha1 2584903a060)",
+  "nextpnr-ice40": "\"nextpnr-ice40\" -- Next Generation Place and Route (Version 0.6-3build5)",
+  "ghdl": "GHDL 4.1.0 (Ubuntu 4.1.0+dfsg-0ubuntu2.1) [Dunoon edition]"
+ },
+ "rows": [
+  {
+   "lut4": 33,
+   "ff": 17,
+   "carry": 0,
+   "fmax_mhz": 149.8,
+   "fmax_seeds": [
+    149.75,
+    149.75,
+    149.75
+   ],
+   "gate_depth": 18,
+   "gates": 92,
+   "group": "mult",
+   "name": "v2 ARRAY/RIPPLE N=4",
+   "n": 4,
+   "arch": "ARRAY",
+   "cpa": "RIPPLE"
+  },
+  {
+   "lut4": 33,
+   "ff": 17,
+   "carry": 0,
+   "fmax_mhz": 149.8,
+   "fmax_seeds": [
+    149.75,
+    149.75,
+    149.75
+   ],
+   "gate_depth": 14,
+   "gates": 92,
+   "group": "mult",
+   "name": "v2 ARRAY/KOGGE_STONE N=4",
+   "n": 4,
+   "arch": "ARRAY",
+   "cpa": "KOGGE_STONE"
+  },
+  {
+   "lut4": 32,
+   "ff": 17,
+   "carry": 3,
+   "fmax_mhz": 187.2,
+   "fmax_seeds": [
+    187.2,
+    187.2,
+    187.2
+   ],
+   "gate_depth": 16,
+   "gates": 86,
+   "group": "mult",
+   "name": "v2 ARRAY/INFERRED N=4",
+   "n": 4,
+   "arch": "ARRAY",
+   "cpa": "INFERRED"
+  },
+  {
+   "lut4": 33,
+   "ff": 17,
+   "carry": 0,
+   "fmax_mhz": 153.3,
+   "fmax_seeds": [
+    153.28,
+    153.28,
+    153.28
+   ],
+   "gate_depth": 18,
+   "gates": 92,
+   "group": "mult",
+   "name": "v2 DADDA/RIPPLE N=4",
+   "n": 4,
+   "arch": "DADDA",
+   "cpa": "RIPPLE"
+  },
+  {
+   "lut4": 33,
+   "ff": 17,
+   "carry": 0,
+   "fmax_mhz": 150.8,
+   "fmax_seeds": [
+    150.85,
+    150.85,
+    150.85
+   ],
+   "gate_depth": 14,
+   "gates": 100,
+   "group": "mult",
+   "name": "v2 DADDA/KOGGE_STONE N=4",
+   "n": 4,
+   "arch": "DADDA",
+   "cpa": "KOGGE_STONE"
+  },
+  {
+   "lut4": 30,
+   "ff": 17,
+   "carry": 6,
+   "fmax_mhz": 192.8,
+   "fmax_seeds": [
+    192.75,
+    192.75,
+    192.75
+   ],
+   "gate_depth": 13,
+   "gates": 88,
+   "group": "mult",
+   "name": "v2 DADDA/INFERRED N=4",
+   "n": 4,
+   "arch": "DADDA",
+   "cpa": "INFERRED"
+  },
+  {
+   "lut4": 49,
+   "ff": 17,
+   "carry": 3,
+   "fmax_mhz": 161.0,
+   "fmax_seeds": [
+    161.03,
+    161.03,
+    161.03
+   ],
+   "group": "mult",
+   "name": "numeric_std '*' N=4",
+   "n": 4,
+   "arch": "BEHAVIORAL",
+   "cpa": "-"
+  },
+  {
+   "lut4": 75,
+   "ff": 25,
+   "carry": 0,
+   "fmax_mhz": 104.1,
+   "fmax_seeds": [
+    104.12,
+    103.0,
+    104.12
+   ],
+   "gate_depth": 30,
+   "gates": 232,
+   "group": "mult",
+   "name": "v2 ARRAY/RIPPLE N=6",
+   "n": 6,
+   "arch": "ARRAY",
+   "cpa": "RIPPLE"
+  },
+  {
+   "lut4": 74,
+   "ff": 25,
+   "carry": 0,
+   "fmax_mhz": 101.3,
+   "fmax_seeds": [
+    101.32,
+    100.32,
+    102.85
+   ],
+   "gate_depth": 21,
+   "gates": 240,
+   "group": "mult",
+   "name": "v2 ARRAY/KOGGE_STONE N=6",
+   "n": 6,
+   "arch": "ARRAY",
+   "cpa": "KOGGE_STONE"
+  },
+  {
+   "lut4": 71,
+   "ff": 25,
+   "carry": 5,
+   "fmax_mhz": 127.4,
+   "fmax_seeds": [
+    133.37,
+    127.42,
+    122.5
+   ],
+   "gate_depth": 24,
+   "gates": 225,
+   "group": "mult",
+   "name": "v2 ARRAY/INFERRED N=6",
+   "n": 6,
+   "arch": "ARRAY",
+   "cpa": "INFERRED"
+  },
+  {
+   "lut4": 80,
+   "ff": 25,
+   "carry": 0,
+   "fmax_mhz": 100.6,
+   "fmax_seeds": [
+    103.9,
+    100.6,
+    100.6
+   ],
+   "gate_depth": 30,
+   "gates": 232,
+   "group": "mult",
+   "name": "v2 DADDA/RIPPLE N=6",
+   "n": 6,
+   "arch": "DADDA",
+   "cpa": "RIPPLE"
+  },
+  {
+   "lut4": 79,
+   "ff": 25,
+   "carry": 0,
+   "fmax_mhz": 102.9,
+   "fmax_seeds": [
+    102.92,
+    102.92,
+    102.92
+   ],
+   "gate_depth": 19,
+   "gates": 262,
+   "group": "mult",
+   "name": "v2 DADDA/KOGGE_STONE N=6",
+   "n": 6,
+   "arch": "DADDA",
+   "cpa": "KOGGE_STONE"
+  },
+  {
+   "lut4": 72,
+   "ff": 25,
+   "carry": 10,
+   "fmax_mhz": 147.4,
+   "fmax_seeds": [
+    147.41,
+    147.41,
+    134.88
+   ],
+   "gate_depth": 19,
+   "gates": 229,
+   "group": "mult",
+   "name": "v2 DADDA/INFERRED N=6",
+   "n": 6,
+   "arch": "DADDA",
+   "cpa": "INFERRED"
+  },
+  {
+   "lut4": 120,
+   "ff": 25,
+   "carry": 6,
+   "fmax_mhz": 125.6,
+   "fmax_seeds": [
+    125.61,
+    126.52,
+    118.25
+   ],
+   "group": "mult",
+   "name": "numeric_std '*' N=6",
+   "n": 6,
+   "arch": "BEHAVIORAL",
+   "cpa": "-"
+  },
+  {
+   "lut4": 132,
+   "ff": 33,
+   "carry": 0,
+   "fmax_mhz": 69.4,
+   "fmax_seeds": [
+    69.72,
+    69.38,
+    65.05
+   ],
+   "gate_depth": 42,
+   "gates": 436,
+   "group": "mult",
+   "name": "v2 ARRAY/RIPPLE N=8",
+   "n": 8,
+   "arch": "ARRAY",
+   "cpa": "RIPPLE"
+  },
+  {
+   "lut4": 132,
+   "ff": 33,
+   "carry": 0,
+   "fmax_mhz": 69.4,
+   "fmax_seeds": [
+    71.86,
+    67.83,
+    69.42
+   ],
+   "gate_depth": 28,
+   "gates": 452,
+   "group": "mult",
+   "name": "v2 ARRAY/KOGGE_STONE N=8",
+   "n": 8,
+   "arch": "ARRAY",
+   "cpa": "KOGGE_STONE"
+  },
+  {
+   "lut4": 134,
+   "ff": 33,
+   "carry": 7,
+   "fmax_mhz": 98.1,
+   "fmax_seeds": [
+    98.12,
+    92.58,
+    98.12
+   ],
+   "gate_depth": 32,
+   "gates": 428,
+   "group": "mult",
+   "name": "v2 ARRAY/INFERRED N=8",
+   "n": 8,
+   "arch": "ARRAY",
+   "cpa": "INFERRED"
+  },
+  {
+   "lut4": 149,
+   "ff": 33,
+   "carry": 0,
+   "fmax_mhz": 78.0,
+   "fmax_seeds": [
+    77.26,
+    82.39,
+    78.02
+   ],
+   "gate_depth": 42,
+   "gates": 436,
+   "group": "mult",
+   "name": "v2 DADDA/RIPPLE N=8",
+   "n": 8,
+   "arch": "DADDA",
+   "cpa": "RIPPLE"
+  },
+  {
+   "lut4": 145,
+   "ff": 33,
+   "carry": 0,
+   "fmax_mhz": 77.7,
+   "fmax_seeds": [
+    77.68,
+    77.43,
+    83.49
+   ],
+   "gate_depth": 21,
+   "gates": 494,
+   "group": "mult",
+   "name": "v2 DADDA/KOGGE_STONE N=8",
+   "n": 8,
+   "arch": "DADDA",
+   "cpa": "KOGGE_STONE"
+  },
+  {
+   "lut4": 134,
+   "ff": 33,
+   "carry": 14,
+   "fmax_mhz": 122.2,
+   "fmax_seeds": [
+    109.79,
+    123.67,
+    122.19
+   ],
+   "gate_depth": 22,
+   "gates": 434,
+   "group": "mult",
+   "name": "v2 DADDA/INFERRED N=8",
+   "n": 8,
+   "arch": "DADDA",
+   "cpa": "INFERRED"
+  },
+  {
+   "lut4": 211,
+   "ff": 33,
+   "carry": 9,
+   "fmax_mhz": 97.8,
+   "fmax_seeds": [
+    97.84,
+    102.76,
+    96.25
+   ],
+   "group": "mult",
+   "name": "numeric_std '*' N=8",
+   "n": 8,
+   "arch": "BEHAVIORAL",
+   "cpa": "-"
+  },
+  {
+   "lut4": 300,
+   "ff": 49,
+   "carry": 0,
+   "fmax_mhz": 48.4,
+   "fmax_seeds": [
+    48.36,
+    46.58,
+    49.48
+   ],
+   "gate_depth": 66,
+   "gates": 1036,
+   "group": "mult",
+   "name": "v2 ARRAY/RIPPLE N=12",
+   "n": 12,
+   "arch": "ARRAY",
+   "cpa": "RIPPLE"
+  },
+  {
+   "lut4": 297,
+   "ff": 49,
+   "carry": 0,
+   "fmax_mhz": 47.5,
+   "fmax_seeds": [
+    48.69,
+    47.46,
+    45.34
+   ],
+   "gate_depth": 41,
+   "gates": 1080,
+   "group": "mult",
+   "name": "v2 ARRAY/KOGGE_STONE N=12",
+   "n": 12,
+   "arch": "ARRAY",
+   "cpa": "KOGGE_STONE"
+  },
+  {
+   "lut4": 308,
+   "ff": 49,
+   "carry": 11,
+   "fmax_mhz": 61.3,
+   "fmax_seeds": [
+    61.26,
+    61.31,
+    61.23
+   ],
+   "gate_depth": 46,
+   "gates": 1029,
+   "group": "mult",
+   "name": "v2 ARRAY/INFERRED N=12",
+   "n": 12,
+   "arch": "ARRAY",
+   "cpa": "INFERRED"
+  },
+  {
+   "lut4": 354,
+   "ff": 49,
+   "carry": 0,
+   "fmax_mhz": 51.1,
+   "fmax_seeds": [
+    53.42,
+    48.26,
+    51.06
+   ],
+   "gate_depth": 66,
+   "gates": 1036,
+   "group": "mult",
+   "name": "v2 DADDA/RIPPLE N=12",
+   "n": 12,
+   "arch": "DADDA",
+   "cpa": "RIPPLE"
+  },
+  {
+   "lut4": 346,
+   "ff": 49,
+   "carry": 0,
+   "fmax_mhz": 51.1,
+   "fmax_seeds": [
+    51.13,
+    49.7,
+    51.85
+   ],
+   "gate_depth": 26,
+   "gates": 1168,
+   "group": "mult",
+   "name": "v2 DADDA/KOGGE_STONE N=12",
+   "n": 12,
+   "arch": "DADDA",
+   "cpa": "KOGGE_STONE"
+  },
+  {
+   "lut4": 331,
+   "ff": 49,
+   "carry": 22,
+   "fmax_mhz": 91.2,
+   "fmax_seeds": [
+    91.22,
+    93.85,
+    89.95
+   ],
+   "gate_depth": 27,
+   "gates": 1039,
+   "group": "mult",
+   "name": "v2 DADDA/INFERRED N=12",
+   "n": 12,
+   "arch": "DADDA",
+   "cpa": "INFERRED"
+  },
+  {
+   "lut4": 467,
+   "ff": 49,
+   "carry": 16,
+   "fmax_mhz": 75.1,
+   "fmax_seeds": [
+    76.06,
+    75.07,
+    72.3
+   ],
+   "group": "mult",
+   "name": "numeric_std '*' N=12",
+   "n": 12,
+   "arch": "BEHAVIORAL",
+   "cpa": "-"
+  },
+  {
+   "lut4": 550,
+   "ff": 65,
+   "carry": 0,
+   "fmax_mhz": 33.1,
+   "fmax_seeds": [
+    33.14,
+    33.68,
+    32.5
+   ],
+   "gate_depth": 90,
+   "gates": 1892,
+   "group": "mult",
+   "name": "v2 ARRAY/RIPPLE N=16",
+   "n": 16,
+   "arch": "ARRAY",
+   "cpa": "RIPPLE"
+  },
+  {
+   "lut4": 546,
+   "ff": 65,
+   "carry": 0,
+   "fmax_mhz": 32.8,
+   "fmax_seeds": [
+    32.84,
+    34.68,
+    31.54
+   ],
+   "gate_depth": 54,
+   "gates": 1964,
+   "group": "mult",
+   "name": "v2 ARRAY/KOGGE_STONE N=16",
+   "n": 16,
+   "arch": "ARRAY",
+   "cpa": "KOGGE_STONE"
+  },
+  {
+   "lut4": 559,
+   "ff": 65,
+   "carry": 15,
+   "fmax_mhz": 45.0,
+   "fmax_seeds": [
+    44.68,
+    44.99,
+    48.23
+   ],
+   "gate_depth": 60,
+   "gates": 1886,
+   "group": "mult",
+   "name": "v2 ARRAY/INFERRED N=16",
+   "n": 16,
+   "arch": "ARRAY",
+   "cpa": "INFERRED"
+  },
+  {
+   "lut4": 641,
+   "ff": 65,
+   "carry": 0,
+   "fmax_mhz": 36.9,
+   "fmax_seeds": [
+    35.09,
+    38.75,
+    36.88
+   ],
+   "gate_depth": 90,
+   "gates": 1892,
+   "group": "mult",
+   "name": "v2 DADDA/RIPPLE N=16",
+   "n": 16,
+   "arch": "DADDA",
+   "cpa": "RIPPLE"
+  },
+  {
+   "lut4": 631,
+   "ff": 65,
+   "carry": 0,
+   "fmax_mhz": 37.4,
+   "fmax_seeds": [
+    35.9,
+    38.01,
+    37.41
+   ],
+   "gate_depth": 28,
+   "gates": 2104,
+   "group": "mult",
+   "name": "v2 DADDA/KOGGE_STONE N=16",
+   "n": 16,
+   "arch": "DADDA",
+   "cpa": "KOGGE_STONE"
+  },
+  {
+   "lut4": 602,
+   "ff": 65,
+   "carry": 30,
+   "fmax_mhz": 75.0,
+   "fmax_seeds": [
+    75.77,
+    72.55,
+    74.98
+   ],
+   "gate_depth": 30,
+   "gates": 1900,
+   "group": "mult",
+   "name": "v2 DADDA/INFERRED N=16",
+   "n": 16,
+   "arch": "DADDA",
+   "cpa": "INFERRED"
+  },
+  {
+   "lut4": 819,
+   "ff": 65,
+   "carry": 24,
+   "fmax_mhz": 67.9,
+   "fmax_seeds": [
+    66.48,
+    68.85,
+    67.93
+   ],
+   "group": "mult",
+   "name": "numeric_std '*' N=16",
+   "n": 16,
+   "arch": "BEHAVIORAL",
+   "cpa": "-"
+  },
+  {
+   "lut4": 141,
+   "ff": 32,
+   "carry": 0,
+   "fmax_mhz": 48.8,
+   "fmax_seeds": [
+    48.77,
+    48.77,
+    47.91
+   ],
+   "group": "legacy",
+   "name": "2023 ARRAY N=8",
+   "n": 8,
+   "arch": "2023-ARRAY",
+   "cpa": "RIPPLE",
+   "gate_depth": 54,
+   "gates": 432
+  },
+  {
+   "lut4": 159,
+   "ff": 32,
+   "carry": 0,
+   "fmax_mhz": 60.2,
+   "fmax_seeds": [
+    60.23,
+    60.23,
+    60.23
+   ],
+   "group": "legacy",
+   "name": "2023 WALLACE N=8",
+   "n": 8,
+   "arch": "2023-WALLACE",
+   "cpa": "RIPPLE",
+   "gate_depth": 51,
+   "gates": 432
+  },
+  {
+   "lut4": 137,
+   "ff": 33,
+   "carry": 0,
+   "fmax_mhz": 72.5,
+   "fmax_seeds": [
+    72.0,
+    72.55,
+    72.55
+   ],
+   "group": "legacy",
+   "name": "2023 BAUGH N=8",
+   "n": 8,
+   "arch": "2023-BAUGH",
+   "cpa": "RIPPLE"
+  },
+  {
+   "lut4": 199,
+   "ff": 62,
+   "carry": 0,
+   "fmax_mhz": 57.0,
+   "fmax_seeds": [
+    57.01,
+    57.01,
+    47.91
+   ],
+   "note": "combinational loop (inferred latch) ignored for timing",
+   "group": "unit",
+   "name": "2023 sync unit (Wallace, tri-states)"
+  },
+  {
+   "lut4": 157,
+   "ff": 33,
+   "carry": 0,
+   "fmax_mhz": 71.8,
+   "fmax_seeds": [
+    72.08,
+    68.09,
+    71.79
+   ],
+   "group": "unit",
+   "name": "arith_unit_min ARRAY/RIPPLE PIPELINE=false"
+  },
+  {
+   "lut4": 164,
+   "ff": 33,
+   "carry": 0,
+   "fmax_mhz": 77.5,
+   "fmax_seeds": [
+    81.4,
+    77.55,
+    76.93
+   ],
+   "group": "unit",
+   "name": "arith_unit_min DADDA/KOGGE_STONE PIPELINE=false"
+  },
+  {
+   "lut4": 160,
+   "ff": 48,
+   "carry": 0,
+   "fmax_mhz": 82.1,
+   "fmax_seeds": [
+    82.96,
+    82.1,
+    79.23
+   ],
+   "group": "unit",
+   "name": "arith_unit_min DADDA/KOGGE_STONE PIPELINE=true"
+  },
+  {
+   "lut4": 147,
+   "ff": 48,
+   "carry": 27,
+   "fmax_mhz": 107.3,
+   "fmax_seeds": [
+    107.33,
+    106.45,
+    111.78
+   ],
+   "group": "unit",
+   "name": "arith_unit_min DADDA/INFERRED PIPELINE=true"
+  },
+  {
+   "lut4": 423,
+   "ff": 163,
+   "carry": 3,
+   "fmax_mhz": 55.4,
+   "fmax_seeds": [
+    55.35,
+    55.72,
+    53.48
+   ],
+   "group": "unit",
+   "name": "arith_unit ARRAY/RIPPLE"
+  },
+  {
+   "lut4": 459,
+   "ff": 163,
+   "carry": 3,
+   "fmax_mhz": 67.7,
+   "fmax_seeds": [
+    68.95,
+    67.74,
+    63.21
+   ],
+   "group": "unit",
+   "name": "arith_unit DADDA/KOGGE_STONE"
+  },
+  {
+   "lut4": 420,
+   "ff": 163,
+   "carry": 65,
+   "fmax_mhz": 86.1,
+   "fmax_seeds": [
+    90.19,
+    86.11,
+    82.86
+   ],
+   "group": "unit",
+   "name": "arith_unit DADDA/INFERRED"
+  },
+  {
+   "lut4": 485,
+   "ff": 221,
+   "carry": 6,
+   "fmax_mhz": 63.3,
+   "fmax_seeds": [
+    63.32,
+    64.55,
+    63.32
+   ],
+   "group": "unit",
+   "name": "arith_unit_serial DADDA/KOGGE_STONE"
+  }
+ ]
+}

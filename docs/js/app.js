@@ -1,12 +1,12 @@
 /* Arithmetic Unit Lab - page behaviour.  Author: Nitish Sundarraj
  * Every number shown comes from docs/js/model.js (the tested port of the RTL)
  * or from docs/data/site-data.js (written by scripts/build_site_data.py from
- * the regression, audit and synthesis runs).
+ * the regression and synthesis runs).
  */
 (function () {
   "use strict";
   const AU = window.AU;
-  const DATA = window.AU_DATA || { synth: { rows: [] }, tests: [], audit: [] };
+  const DATA = window.AU_DATA || { synth: { rows: [] }, tests: [] };
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -628,15 +628,10 @@
       for (let i = Math.min(c, w) - 1; i >= 0; i--) { const v = AU.bit(xp, i); cells.push(`<span class="${v ? "lost1" : "lost"}" title="shifted out, bit ${i}">${v}</span>`); }
     }
     $("#sBits").innerHTML = cells.join("");
-    // 2023 divider_2c in signed mode: always pads with 1s
-    const ones = c >= 16 ? 0xFFFF : ((Math.floor(xp / 2 ** c)) | ((0xFFFF << (16 - c)) & 0xFFFF)) & 0xFFFF;
-    const old = AU.toSigned(c === 0 ? xp : ones, 16);
-    const ok = old === d.floorQ;
     $("#sTbl").innerHTML = [
       ["x", `${fmt(d.xv)}`], ["arithmetic shift (floor)", `${fmt(d.floorQ)}`], ["bits shifted out", c === 0 ? "none" : (d.lost ? "some 1s" : "all 0")],
-      ["round_up = negative and a 1 lost", `${d.rnd}`], ["q + round_up (what v2 returns)", `<b>${fmt(d.trunc)}</b>`],
-      [`x / 2<sup>${c}</sup> rounded toward zero`, `${fmt(AU.divTrunc(d.xv, 2 ** c))}`],
-      ["2023 divider_2c, signed mode", `${fmt(old)} ${ok ? `<span class="pill good">same as floor</span>` : `<span class="pill bad">wrong: pads with 1s even when x ≥ 0</span>`}`],
+      ["round_up = negative and a 1 lost", `${d.rnd}`], ["q + round_up (what the unit returns)", `<b>${fmt(d.trunc)}</b>`],
+      [`x / 2<sup>${c}</sup> rounded toward zero`, `${fmt(AU.divTrunc(d.xv, 2 ** c))} <span class="pill good">match</span>`],
     ].map(([k, v]) => `<tr><td>${k}</td><td class="num">${v}</td></tr>`).join("");
   }
   ["#sX", "#sC"].forEach((s) => $(s).addEventListener("input", renderShift));
@@ -734,7 +729,7 @@
 
   /* ============================================================= RESULTS */
   const SERIES = [
-    ["ARRAY", "RIPPLE", "array + ripple (2023 style)", "--s1"], ["ARRAY", "KOGGE_STONE", "array + Kogge-Stone", "--s2"],
+    ["ARRAY", "RIPPLE", "array + ripple", "--s1"], ["ARRAY", "KOGGE_STONE", "array + Kogge-Stone", "--s2"],
     ["DADDA", "RIPPLE", "Dadda + ripple", "--s3"], ["DADDA", "KOGGE_STONE", "Dadda + Kogge-Stone", "--s4"],
     ["DADDA", "INFERRED", "Dadda + carry chain", "--s6"], ["BEHAVIORAL", "-", "numeric_std \"*\"", "--s5"],
   ];
@@ -742,8 +737,7 @@
     const rows = (DATA.synth && DATA.synth.rows || []).filter((r) => r.group === "mult");
     if (!rows.length) { el.innerHTML = `<p class="small muted">No synthesis data bundled.</p>`; return; }
     const ns = [...new Set(rows.map((r) => r.n))].sort((a, b) => a - b);
-    const legacy = (DATA.synth.rows || []).filter((r) => r.group === "legacy");
-    const vals = rows.map((r) => r[key]).concat(legacy.map((r) => r[key])).filter((v) => v != null);
+    const vals = rows.map((r) => r[key]).filter((v) => v != null);
     const W = 520, H = 300, L = 48, R = 12, T = 12, B = 34;
     const ymax = Math.max(...vals) * 1.08, xmin = ns[0], xmax = ns[ns.length - 1];
     const X = (n) => L + (n - xmin) / (xmax - xmin || 1) * (W - L - R), Y = (v) => T + (1 - v / ymax) * (H - T - B);
@@ -757,84 +751,55 @@
       s.push(`<polyline points="${pts.map((r) => `${X(r.n)},${Y(r[key])}`).join(" ")}" fill="none" stroke="var(${col})" stroke-width="2.2" stroke-linejoin="round"/>`);
       pts.forEach((r) => s.push(`<circle cx="${X(r.n)}" cy="${Y(r[key])}" r="3.2" fill="var(${col})"><title>${esc(r.name)}: ${r[key]}</title></circle>`));
     });
-    legacy.forEach((r, i) => {
-      if (r[key] == null) return;
-      const x = X(8) + (i - 1) * 10, y = Y(r[key]);
-      s.push(`<path d="M${x - 4},${y - 4} L${x + 4},${y + 4} M${x - 4},${y + 4} L${x + 4},${y - 4}" stroke="var(--bad)" stroke-width="2"><title>${esc(r.name)}: ${r[key]}</title></path>`);
-    });
     s.push(`</svg>`);
     el.innerHTML = s.join("");
   }
   function renderResults() {
     lineChart($("#chFmax"), "fmax_mhz", "fmax");
     lineChart($("#chLut"), "lut4", "LUT4");
-    $("#chLegend").innerHTML = SERIES.map(([, , l, c]) => `<span><i style="background:var(${c})"></i>${esc(l)}</span>`).join("") + `<span><i style="background:var(--bad);border-radius:0"></i>2023 multipliers (array, "Wallace", Baugh-Wooley), N = 8</span>`;
-    const units = (DATA.synth && DATA.synth.rows || []).filter((r) => r.group === "unit");
+    $("#chLegend").innerHTML = SERIES.map(([, , l, c]) => `<span><i style="background:var(${c})"></i>${esc(l)}</span>`).join("");
+    const units = (DATA.synth && DATA.synth.rows || []).filter((r) => r.group === "unit" && !/^20\d\d/.test(r.name));
     const notes = {
-      "2023": "internal tri-states, latch on P, needs a 2-cycle load",
       "arith_unit_min": "minimum requirement, P = A·B/4 + 1",
       "arith_unit ": "both formulas, signed, err/ovf",
       "arith_unit_serial": "8 pins",
     };
     $("#unitTable tbody").innerHTML = units.map((r) => {
       const note = Object.keys(notes).find((k) => r.name.startsWith(k.trim()) && (k !== "arith_unit " || !r.name.startsWith("arith_unit_")));
-      return `<tr class="${r.name.startsWith("2023") ? "" : ""}"><td>${esc(r.name)}</td><td class="num">${r.lut4}</td><td class="num">${r.ff}</td><td class="num">${r.fmax_mhz ?? "–"}</td><td class="small">${note ? notes[note] : ""}${r.note ? ` (${esc(r.note)})` : ""}</td></tr>`;
+      return `<tr><td>${esc(r.name)}</td><td class="num">${r.lut4}</td><td class="num">${r.ff}</td><td class="num">${r.fmax_mhz ?? "–"}</td><td class="small">${note ? notes[note] : ""}${r.note ? ` (${esc(r.note)})` : ""}</td></tr>`;
     }).join("");
     const m8 = (DATA.synth.rows || []).filter((r) => r.group === "mult" && r.n === 8);
-    const leg = (DATA.synth.rows || []).filter((r) => r.group === "legacy");
-    const label = (r) => r.arch === "BEHAVIORAL" ? 'numeric_std "*" (tool-built)' : `v2 ${r.arch === "ARRAY" ? "array" : "Dadda"} + ${{ RIPPLE: "ripple", KOGGE_STONE: "Kogge-Stone", INFERRED: "carry chain" }[r.cpa]}`;
-    const fastest = Math.max(...m8.concat(leg).map((r) => r.fmax_mhz || 0));
-    $("#multTable tbody").innerHTML = leg.map((r) => [r.name.replace(" N=8", "").replace("2023 WALLACE", '2023 "Wallace"').replace("2023 ARRAY", "2023 array").replace("2023 BAUGH", "2023 Baugh-Wooley"), r])
-      .concat(m8.map((r) => [label(r), r]))
+    const label = (r) => r.arch === "BEHAVIORAL" ? 'numeric_std "*" (tool-built)' : `${r.arch === "ARRAY" ? "Carry-save array" : "Dadda tree"} + ${{ RIPPLE: "ripple", KOGGE_STONE: "Kogge-Stone", INFERRED: "carry chain" }[r.cpa]}`;
+    const fastest = Math.max(...m8.map((r) => r.fmax_mhz || 0));
+    $("#multTable tbody").innerHTML = m8.map((r) => [label(r), r])
       .map(([n, r]) => `<tr class="${r.fmax_mhz === fastest ? "me" : ""}"><td>${esc(n)}</td><td class="num">${r.lut4}</td><td class="num">${r.fmax_mhz ?? "–"}</td><td class="num">${r.gate_depth ?? "–"}</td><td class="num">${r.gates ?? "–"}</td></tr>`).join("");
     const best = m8.filter((r) => r.arch === "DADDA" && r.cpa === "INFERRED")[0];
-    const old = (DATA.synth.rows || []).find((r) => r.name === "2023 ARRAY N=8");
-    if (best && old) {
-      $("#kpiFmax").innerHTML = `${Math.round(best.fmax_mhz)} <small>vs ${Math.round(old.fmax_mhz)} MHz</small>`;
-    }
-    $("#synthNote").textContent = DATA.synth.flow ? `Flow: ${DATA.synth.flow}. ${Object.values(DATA.synth.tools || {}).join(" · ")}. fmax numbers are for iCE40; the 2023 report targeted a MAX 10 without a clock constraint, so it never reported one.` : "";
+    if (best) $("#kpiFmax").innerHTML = `${Math.round(best.fmax_mhz)} <small>MHz</small>`;
+    $("#synthNote").textContent = DATA.synth.flow ? `Flow: ${DATA.synth.flow}. ${Object.values(DATA.synth.tools || {}).join(" · ")}. fmax is for iCE40; syn/quartus has the MAX 10 project with its clock constraint.` : "";
   }
   renderResults();
   onTheme(renderResults);
 
-  /* ============================================================ FINDINGS */
-  const A = DATA.audit || {};
-  const FINDINGS = [
-    ["bad", "Top level does not compile", "arithmetic_hw.vhd declares entity arithmeitc_hw but ends arithmetic_hw, and its component declarations omit the start ports. Seven of 97 files in the 2023 tree fail to analyse on their own.",
-      "Every RTL file analyses as VHDL-93 and VHDL-2008; CI compiles the whole tree on each push."],
-    ["bad", "Entity names do not match their instances", "sync_arithmetic_hw.vhd and generic_array_baugh.vhd both declare an entity called synthesis (a Quartus leftover), while the testbench and the v3 top instantiate sync_arithmetic_hw and generic_array_multiplier. Nothing binds.",
-      "One entity per file, file named after it, entity instantiation (entity work.x) so a mismatch is a compile error."],
-    ["bad", "A one-cycle load latches Z", "Operand registers load whenever load = 1, but the tri-state in front of them only opens in load_state, one clock later. With load high for one edge (the specification), A_reg takes 'Z' and P comes out as X. It only works if load is held for two edges.",
-      "Registers load directly on the load edge; the regression drives one-cycle loads, held loads and back-to-back loads."],
-    ["bad", "The result disappears after one clock", "P is driven only in output_state and is 'Z' otherwise; status is high for a single cycle; P_end is written as a latch.",
-      "P, status, err and ovf are registers that hold until the next load; the testbench checks they hold."],
-    ["warn", "Tri-states inside the design", "Operands, the multiplier, the divider and the adder all drive 'Z' when not strobed. FPGAs have no internal tri-state buffers, so synthesis has to rewrite them as multiplexer logic; the RTL viewer PDFs in the submission still show the tri-state buffers.",
-      "No 'Z' anywhere in the RTL; enables go to the registers instead."],
-    ["bad", "Submitted testbenches cannot fail", "tb_array_multiplier, tb_divider_unit and tb_full_adder_16 leave start unconnected, so 254 of 256, 65,532 of 65,536 and 65,535 of 65,536 assertions fail, and the array bench still prints \"All Test Cases Passed\". It also tried only 256 of the 65,536 operand pairs.",
-      "Benches count failures, end with PASS or FAIL and a non-zero exit, and are exhaustive wherever the input space allows."],
-    ["bad", "Signed division is wrong for every non-negative product", "divider_2c pads with 1s whenever mode = 1, regardless of the sign, so all 98,304 non-negative test inputs come out negative. The data analyser then takes a one's complement of the quotient and zero-extends D. The signed formula was wrong in 1,996 of 2,000 random cases.",
-      "Arithmetic shift with sign fill, round toward zero through the adder's carry-in, D sign-extended."],
-    ["warn", "Generic only up to 16 bits", "The generic adder and divider are hard-wired to 32 internal bits (K = 32) and read only 5 bits of C, so N = 17 does not elaborate and C ≥ 32 is misread.",
-      "Everything is sized from N, CW and DW; tested from N = 2 to 32, shifts wider than the word included."],
-    ["warn", "Half of the additional requirements were missing", "A·B/C² + D, serial I/O and any speed optimisation were not implemented; the Quartus runs had no clock constraint, so no fmax was ever reported.",
-      "Restoring C² divider sharing the multiplier, 8-pin serial wrapper, Dadda tree and prefix adders, fmax measured for every build."],
-    ["warn", "The \"Wallace tree\" is still an array", "wallace_tree_multiplier.vhd reorders the array's adders, but each row still waits for the one above: its longest path is 51 gates, against 54 for the plain array. A reduction tree compresses every column at the same time.",
-      "A real Dadda tree, generic in N: 21 gates deep at N = 8 with the Kogge-Stone adder, and 122 MHz on iCE40 with the carry chain (2023 array: 49 MHz)."],
-    ["good", "What was already right", "The array multiplier, the reorganised array (\"Wallace\") and the generic Baugh-Wooley array give the right product for all 65,536 operand pairs; the unsigned 2^C formula is right once the load is held for two cycles.",
-      "v2 keeps the carry-save array and Baugh-Wooley idea and adds a real Dadda tree next to them."],
+  /* ======================================================== DESIGN NOTES */
+  const NOTES_D = [
+    ["handshake", "Operands are latched on the load edge", "load = 1 on one rising edge is enough: A, B, C, D and the mode bits go straight into their registers and status drops. P, status, err and ovf are registers too, so the result holds until the next load, and a load while busy simply restarts with the new operands.",
+      "reg_en with en = load for every operand; status, err and ovf are dff_en flip-flops set by the ADD state and cleared by load."],
+    ["fpga", "No tri-states, no latches", "Every signal has exactly one driver and every storage element is an edge-triggered flip-flop with an asynchronous active-low reset. That keeps the design portable across FPGA families and simulators and lets timing analysis see every path.",
+      "Plain VHDL-93, analysed as both VHDL-93 and VHDL-2008 in every regression run."],
+    ["speed", "A Dadda tree for depth, a carry-save array for regularity", "The array adds one row per full-adder delay. The Dadda tree compresses every column at once through the heights 6, 4, 3, 2 for N = 8, using the fewest adders that reach each target. At N = 8 with a Kogge-Stone final adder the longest path is 21 gates, half the 42 of the array with a ripple adder.",
+      "au_pkg.dadda_plan computes heights and adder counts at elaboration; dadda_multiplier only instantiates what the plan says, for any N."],
+    ["signed", "Signed numbers at no extra cost", "Modified Baugh-Wooley: complement the partial products that touch exactly one sign bit and add 2^N + 2^(2N−1). The first constant enters through the final adder's carry-in and the second through an input that is otherwise always 0, so signed mode adds no extra adder row.",
+      "pp_cell with inv = sgn on the mixed-sign products; sgn wired to the CPA carry-in and to its top x bit."],
+    ["rounding", "Round toward zero through the adder's carry-in", "An arithmetic shift rounds negative numbers down: −15 >> 1 is −8, while −15 / 2 is −7. The shifter reports when a negative value lost any 1-bits, and the adder that already adds D adds that bit through its carry-in. The divider path negates its quotient the same way: invert, carry-in 1.",
+      "shift_divider.round_up and the rnd flip-flop feed cpa.ci in the ADD state."],
+    ["area", "One multiplier, two jobs", "A·B/C² + D needs C² as well as A·B. Instead of a second multiplier the state machine runs the shared one twice: C·C in the SQR state, A·B in MUL. A restoring divider then produces one quotient bit per clock from |A·B| and C².",
+      "Input multiplexers in front of multiplier, selected by state = S_SQR; restoring_divider with W = 2N steps."],
+    ["speed", "The right final adder for each target", "Ripple is the smallest, Kogge-Stone has log₂ depth on any technology, and INFERRED hands the addition to the FPGA's dedicated carry chain. With the Dadda tree and the carry chain the 8×8 multiplier runs at 122 MHz in 134 LUTs, ahead of numeric_std \"*\" at 98 MHz in 211 LUTs.",
+      "cpa with ARCH = RIPPLE | KOGGE_STONE | INFERRED, selected by the CPA_ARCH generic of every top level."],
+    ["pins", "Serial I/O with its own buffer", "arith_unit_serial shifts the 34-bit operand frame in on sin, pulses start, and shifts P, err and ovf back out on sout: 8 pins instead of 56. Because the core latches its operands on start, the next frame can be shifted in while the current one is computing.",
+      "A FI-bit input shift register and an FO-bit output shift register around an unchanged arith_unit."],
   ];
-  $("#findings").innerHTML = FINDINGS.map(([sev, h, p, fix]) => `<div class="finding"><span class="pill ${sev}">${{ bad: "defect", warn: "weakness", good: "correct" }[sev]}</span><div><h4>${esc(h)}</h4><p>${esc(p)}</p></div><div class="fix"><b>${sev === "good" ? "Kept" : "v2"}</b>${esc(fix)}</div></div>`).join("");
-
-  function drawLegacyWave() {
-    const tr = A.sync1 || [];
-    const steps = tr.length + 2;
-    const Pv = ["–", "–"].concat(tr.map((t) => (/^Z+$/.test(t.p) ? "Z" : /X/.test(t.p) ? "X" : t.p)));
-    const st = [0, 0].concat(tr.map((t) => +t.status));
-    const load = [0, 1].concat(tr.map(() => 0));
-    waveGeneric($("#legacyWave"), [{ name: "clk", kind: "clk" }, { name: "load", kind: "bit", vals: load }, { name: "status", kind: "bit", vals: st },
-      { name: "P", kind: "bus", vals: Pv }, { name: "expected", kind: "bus", vals: ["–", "–"].concat(tr.map(() => A.expected || "5001")) }], steps, { cw: 64 });
-  }
-  onTheme(drawLegacyWave);
+  $("#findings").innerHTML = NOTES_D.map(([tag, h, p, rtl]) => `<div class="finding"><span class="pill info">${esc(tag)}</span><div><h4>${esc(h)}</h4><p>${esc(p)}</p></div><div class="fix"><b>In the RTL</b>${esc(rtl)}</div></div>`).join("");
 
   /* ---------------------------------------------------------------- boot */
   refreshBits();
@@ -845,5 +810,4 @@
   renderShift();
   renderDiv();
   drawTraces();
-  drawLegacyWave();
 })();

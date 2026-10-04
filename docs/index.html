@@ -32,13 +32,13 @@
       <li><a href="#serial">Serial I/O</a></li>
       <li><a href="#verification">Verification</a></li>
       <li><a href="#results">Results</a></li>
-      <li><a href="#changes">2023 → v2</a></li>
+      <li><a href="#design">Design</a></li>
       <li><a href="#method">Method</a></li>
     </ul>
     <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch colour theme" title="Switch colour theme">
       <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 1.5v11a5.5 5.5 0 0 1 0-11z" fill="currentColor"/></svg>
     </button>
-    <a class="btn btn-primary btn-sm cta" href="https://github.com/sundarrajnitish/Arithmetic-Unit-Lab">Source on GitHub</a>
+    <a class="btn btn-primary btn-sm cta" href="https://github.com/sundarrajnitish/Arithmetic-Unit-Lab">GitHub</a>
   </div>
 </nav>
 
@@ -49,10 +49,10 @@
       <div class="eyebrow">Digital system design · FPGA arithmetic</div>
       <h1>An arithmetic unit, built up from full adders.</h1>
       <p class="formula"><span>P = A·B/4 + 1</span><span>A·B/2<sup>C</sup> + D</span><span>A·B/C² + D</span></p>
-      <p class="lead">Two 8-bit operands go into registers, a multiplier forms the product, a shifter divides it and an adder finishes the formula, all in structural VHDL. This lab rebuilds a 2023 course project: generic widths, signed numbers, both division formulas, serial I/O and a speed pass. Every result on this page is checked against the same reference model as the testbenches.</p>
+      <p class="lead">Two 8-bit operands go into registers, a multiplier forms the product, a shifter divides it and an adder finishes the formula, all in structural VHDL. On top of the base formula it takes any operand width, signed numbers, two division formulas and serial I/O, and has a speed-optimised build. Every result on this page is checked against the same reference model as the testbenches.</p>
       <div class="actions">
         <a class="btn btn-primary" href="#simulator">Run the simulator</a>
-        <a class="btn btn-ghost" href="#changes">What changed since 2023</a>
+        <a class="btn btn-ghost" href="#design">Read the design notes</a>
       </div>
     </div>
     <figure class="hero-viz" style="margin:0">
@@ -67,7 +67,7 @@
     <div class="kpi"><div class="v" id="kpiPairs">65,536</div><div class="l">operand pairs checked for every multiplier and the P = A·B/4 + 1 unit (N = 8)</div></div>
     <div class="kpi"><div class="v" id="kpiRuns">–</div><div class="l">regression runs across widths 2–32, three adder and two multiplier architectures, 0 failures</div></div>
     <div class="kpi"><div class="v">56 <small>→</small> 8</div><div class="l">device pins for the full unit once operands and result travel serially</div></div>
-    <div class="kpi"><div class="v" id="kpiFmax">–</div><div class="l" id="kpiFmaxL">8×8 multiplier fmax, Dadda tree + FPGA carry chain vs the 2023 array (iCE40 HX8K)</div></div>
+    <div class="kpi"><div class="v" id="kpiFmax">–</div><div class="l" id="kpiFmaxL">8×8 multiplier fmax with the Dadda tree and the FPGA carry chain (Lattice iCE40 HX8K)</div></div>
   </div>
 </section>
 
@@ -232,7 +232,7 @@
             <div class="field" style="flex:1;min-width:130px"><label for="sX">x (signed 16-bit)</label><input id="sX" type="number" value="-15" min="-32768" max="32767"></div>
             <div class="field" style="flex:1;min-width:130px"><label for="sC">C <span id="sCv">1</span></label><input id="sC" type="range" min="0" max="18" value="1"></div>
           </div>
-          <div class="chips mt8"><button class="chip" type="button" data-x="-15" data-c="1">−15 ÷ 2¹: rounding</button><button class="chip" type="button" data-x="1000" data-c="3">1000 ÷ 2³: the 2023 bug</button><button class="chip" type="button" data-x="-1" data-c="18">−1 ÷ 2¹⁸: shift past the word</button></div>
+          <div class="chips mt8"><button class="chip" type="button" data-x="-15" data-c="1">−15 ÷ 2¹: rounding</button><button class="chip" type="button" data-x="1000" data-c="3">1000 ÷ 2³: positive</button><button class="chip" type="button" data-x="-1" data-c="18">−1 ÷ 2¹⁸: shift past the word</button></div>
           <div class="bitstrip" id="sBits" aria-label="Bits after the shift"></div>
           <div class="legend mt8"><span><i style="background:var(--brand)"></i>kept</span><span><i style="background:var(--accent)"></i>sign fill</span><span><i style="background:var(--warn)"></i>1 shifted out (round up)</span><span><i style="background:var(--ink-3)"></i>0 shifted out</span></div>
           <div class="tbl-wrap mt16"><table class="data"><tbody id="sTbl"></tbody></table></div>
@@ -309,18 +309,14 @@
   </div>
 </section>
 
-<!-- ================================================================= CHANGES -->
-<section class="band alt" id="changes">
+<!-- ============================================================ DESIGN NOTES -->
+<section class="band alt" id="design">
   <div class="wrap">
     <div class="sec-head">
-      <div><div class="eyebrow">2023 → v2</div><h2>What the audit found</h2></div>
-      <p class="lead">The 2023 multipliers were right: all 65,536 products of the array, the reorganised array and the Baugh-Wooley array check out. The problems sat around them, in wiring, handshakes, sign handling and tests that could not fail. Every item below is reproduced by <code>legacy/audit/run_audit.sh</code> against the original files, which are kept unchanged in <code>legacy/</code>.</p>
+      <div><div class="eyebrow">Design notes</div><h2>The decisions behind the datapath</h2></div>
+      <p class="lead">A handful of choices shape everything above: how operands enter, how signs and rounding cost no extra hardware, where the one multiplier is reused, and which adder each target gets. Each note names the part of the RTL that carries it out.</p>
     </div>
-    <div class="tool">
-      <div class="tool-bar"><span class="title">2023 sync unit, replayed</span><span class="sub">load held for one clock · A = 200, B = 100 · expected 5001</span></div>
-      <div class="wave"><div class="wave-scroll"><canvas id="legacyWave" height="150"></canvas></div></div>
-    </div>
-    <div class="findings mt24" id="findings"></div>
+    <div class="findings" id="findings"></div>
   </div>
 </section>
 
@@ -344,7 +340,6 @@
 git clone https://github.com/sundarrajnitish/Arithmetic-Unit-Lab
 cd Arithmetic-Unit-Lab
 scripts/run_tests.sh           <span class="c"># full regression</span>
-legacy/audit/run_audit.sh      <span class="c"># reproduce the 2023 findings</span>
 python3 scripts/synth_sweep.py <span class="c"># area and fmax sweep</span>
 node tests/test_js_model.mjs   <span class="c"># site model vs vectors</span></pre></div>
       <div><div class="pane-title">Repository</div>
@@ -355,14 +350,14 @@ rtl/top/      arith_unit_min · arith_unit · arith_unit_serial
 tb/           self-checking testbenches + golden-model vectors
 model/        au_model.py (reference)       tests/  pytest + node
 syn/          harnesses, Quartus MAX 10 project, SDC
-legacy/       the 2023 sources, untouched · audit/</pre></div>
+sim/          ModelSim / Questa script</pre></div>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <span>Arithmetic Unit Lab · Nitish Sundarraj · COEN 6501 Digital Systems Design, Concordia University, Fall 2023, revisited 2026</span>
+    <span>Arithmetic Unit Lab · Nitish Sundarraj · COEN 6501 Digital Systems Design, Concordia University</span>
     <span><a href="https://github.com/sundarrajnitish/Arithmetic-Unit-Lab">github.com/sundarrajnitish/Arithmetic-Unit-Lab</a> · Apache-2.0</span>
   </div>
 </footer>

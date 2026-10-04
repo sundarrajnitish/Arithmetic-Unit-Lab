@@ -760,7 +760,7 @@
     $("#chLegend").innerHTML = SERIES.map(([, , l, c]) => `<span><i style="background:var(${c})"></i>${esc(l)}</span>`).join("");
     const units = (DATA.synth && DATA.synth.rows || []).filter((r) => r.group === "unit" && !/^20\d\d/.test(r.name));
     const notes = {
-      "arith_unit_min": "minimum requirement, P = A·B/4 + 1",
+      "arith_unit_min": "base formula, P = A·B/4 + 1",
       "arith_unit ": "both formulas, signed, err/ovf",
       "arith_unit_serial": "8 pins",
     };

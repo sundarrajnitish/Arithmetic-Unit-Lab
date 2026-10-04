@@ -22,7 +22,7 @@
         <path d="M8 21 L15 8 L22 21 M11 16 H19" stroke="#fff" stroke-width="2.4" fill="none" stroke-linejoin="round"/>
         <circle cx="22" cy="21" r="2.2" fill="var(--sig-bus)"/>
       </svg>
-      <span>Arithmetic Unit Lab<small>COEN 6501 · structural VHDL</small></span>
+      <span>Arithmetic Unit Lab<small>Structural VHDL · FPGA arithmetic</small></span>
     </a>
     <ul>
       <li><a href="#simulator">Simulator</a></li>
@@ -122,7 +122,7 @@
             <button class="btn btn-line btn-sm" id="bRun" type="button">Run to status</button>
             <button class="btn btn-line btn-sm" id="bReset" type="button">Reset</button>
           </div>
-          <p class="small muted">Load raises <code>load</code> for the next rising edge only, the way the specification describes it.</p>
+          <p class="small muted">Load raises <code>load</code> for the next rising edge only: a one-clock strobe is all the unit needs.</p>
         </div>
 
         <div class="tool-body">
@@ -325,7 +325,7 @@
   <div class="wrap">
     <div class="sec-head">
       <div><div class="eyebrow">Method</div><h2>From specification to bitstream</h2></div>
-      <p class="lead">Everything runs on open tools: GHDL for simulation, yosys with the GHDL plugin and nextpnr for synthesis, Python and Node for the models. The RTL is plain VHDL-93, so ModelSim and Quartus take it as well; a Quartus project for the course's MAX 10 board is in <code>syn/quartus</code>.</p>
+      <p class="lead">Everything runs on open tools: GHDL for simulation, yosys with the GHDL plugin and nextpnr for synthesis, Python and Node for the models. The RTL is plain VHDL-93, so ModelSim and Quartus take it as well; a Quartus project for an Intel MAX 10 FPGA is in <code>syn/quartus</code>.</p>
     </div>
     <div class="flow">
       <div><span class="eyebrow">Specify</span><h4>Golden model</h4><p><code>model/au_model.py</code> defines P, err, ovf and the latency for every input, plus the Dadda plan.</p></div>
@@ -357,7 +357,7 @@ sim/          ModelSim / Questa script</pre></div>
 
 <footer>
   <div class="wrap">
-    <span>Arithmetic Unit Lab · Nitish Sundarraj · COEN 6501 Digital Systems Design, Concordia University</span>
+    <span>Arithmetic Unit Lab · designed and built by Nitish Sundarraj</span>
     <span><a href="https://github.com/sundarrajnitish/Arithmetic-Unit-Lab">github.com/sundarrajnitish/Arithmetic-Unit-Lab</a> · Apache-2.0</span>
   </div>
 </footer>
